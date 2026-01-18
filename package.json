@@ -19,7 +19,7 @@
   ],
   "scripts": {
     "build": "rollup -c",
-    "prepare": "yarn install --silent && yarn build",
+    "prepare": "yarn install --ignore-scripts && yarn build",
     "prepublishOnly": "yarn build",
     "pretest": "yarn build"
   },
