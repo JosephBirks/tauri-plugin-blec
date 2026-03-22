@@ -156,6 +156,11 @@ impl btleplug::api::Central for Adapter {
         Err(btleplug::Error::NotSupported("add_peripheral".to_string()))
     }
 
+    async fn clear_peripherals(&self) -> Result<()> {
+        DEVICES.write().await.clear();
+        Ok(())
+    }
+
     async fn adapter_info(&self) -> Result<String> {
         todo!()
     }
@@ -311,6 +316,7 @@ impl btleplug::api::Peripheral for Peripheral {
             tx_power_level: self.tx_power_level,
             // TODO: implement the rest
             // at the moment not used by the handler or BleDevice struct so we can return default values
+            advertisement_name: Some(self.name.clone()),
             address_type: Default::default(),
             class: Default::default(),
         }))
@@ -496,6 +502,11 @@ impl btleplug::api::Peripheral for Peripheral {
             )
             .map_err(|e| btleplug::Error::RuntimeError(e.to_string()))?;
         Ok(())
+    }
+
+    // TODO: store the actual negotiated MTU from connect() instead of returning the requested value
+    fn mtu(&self) -> u16 {
+        517
     }
 
     async fn notifications(&self) -> Result<Pin<Box<dyn Stream<Item = ValueNotification> + Send>>> {
