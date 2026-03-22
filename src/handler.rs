@@ -489,6 +489,9 @@ impl Handler {
         let adapter = adapter.clone();
         state.scan_task = Some(tokio::task::spawn(async move {
             self_devices.lock().await.clear();
+            // Clear btleplug's internal peripheral list so power-cycled devices
+            // don't appear as duplicates with different addresses.
+            let _ = adapter.clear_peripherals().await;
             let loops = timeout / 200;
             let mut devices;
             for _ in 0..loops {
